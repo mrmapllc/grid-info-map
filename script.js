@@ -73,7 +73,7 @@ fetch('grids.geojson')
 
 fetch('CanadaProvinces.geojson')
     .then(response => response.json())
-    .then(data => canadaProvincesLayer.addData(data);
+    .then(data => canadaProvincesLayer.addData(data));
 
 // Create custom control container for dropdown and search bar
 var customSearchControl = L.Control.extend({
@@ -146,7 +146,12 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
 // Function to display grid information in the sidebar and handle updates
 function displayGridInfo(properties) {
     fetch(`https://grid-info-backend.onrender.com/api/grids/${properties.OBJECTID}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(grid => {
             let content = `<p><strong>Grid:</strong> ${grid.attributes.Grid}</p>`;
             for (let key in grid.attributes) {
@@ -183,7 +188,12 @@ function addField(gridId) {
                 },
                 body: JSON.stringify(newField)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 displayGridInfo({ OBJECTID: gridId });
                 alert('Field added successfully!');
@@ -211,7 +221,12 @@ function saveGridInfo(gridId) {
         },
         body: JSON.stringify(newInfo)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         alert('Grid information updated successfully!');
     })
@@ -228,7 +243,12 @@ function deleteField(gridId) {
         fetch(`https://grid-info-backend.onrender.com/api/grids/${gridId}/${fieldName}`, {
             method: 'DELETE'
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             displayGridInfo({ OBJECTID: gridId });
             alert('Field deleted successfully!');
