@@ -143,6 +143,11 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
                     // Display grid info and center map on grid
                     displayGridInfo(grid.attributes);
                     sidebar.open('info');
+                    gridsLayer.eachLayer(function(layer) {
+                        if (layer.feature.properties.Grid === searchText) {
+                            map.fitBounds(layer.getBounds());
+                        }
+                    });
                 })
                 .catch(error => {
                     console.error('Error fetching grid info:', error);
