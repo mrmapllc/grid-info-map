@@ -142,6 +142,7 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
                 .then(grid => {
                     // Display grid info and center map on grid
                     displayGridInfo(grid.attributes);
+                    sidebar.open('info');
                 })
                 .catch(error => {
                     console.error('Error fetching grid info:', error);
@@ -168,6 +169,7 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
                             displayGridInfo(layer.feature.properties);
                         }
                     });
+                    sidebar.open('info');
                 } else {
                     Swal.fire('Error', 'Address not found', 'error');
                 }
@@ -191,7 +193,6 @@ function displayGridInfo(properties) {
         <button onclick="deleteField('${properties.Grid}')">Delete Field</button>
     `;
     document.getElementById('grid-info-content').innerHTML = content;
-    sidebar.open('info');
 }
 
 // Function to add a new field to the grid information
@@ -301,6 +302,11 @@ function deleteField(gridId) {
         }
     });
 }
+
+// Toggle sidebar visibility
+document.getElementById('toggle-sidebar-button').addEventListener('click', function() {
+    sidebar.toggle();
+});
 
 // Add layer control
 var baseLayers = {
