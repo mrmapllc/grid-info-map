@@ -145,7 +145,7 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
                 })
                 .catch(error => {
                     console.error('Error fetching grid info:', error);
-                    alert('Grid not found');
+                    Swal.fire('Error', 'Grid not found', 'error');
                 });
         } else if (searchType === 'address') {
             geocoder.geocode(searchText, function(results) {
@@ -169,7 +169,7 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
                         }
                     });
                 } else {
-                    alert('Address not found');
+                    Swal.fire('Error', 'Address not found', 'error');
                 }
             });
         }
@@ -196,35 +196,49 @@ function displayGridInfo(properties) {
 
 // Function to add a new field to the grid information
 function addField(gridId) {
-    const fieldName = prompt("Enter the name of the new field:");
-    if (fieldName) {
-        const fieldValue = prompt(`Enter the value for ${fieldName}:`);
-        if (fieldValue !== null) {
-            const newField = {};
-            newField[fieldName] = fieldValue;
-            fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newField)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+    Swal.fire({
+        title: 'Enter the name of the new field:',
+        input: 'text',
+        showCancelButton: true,
+        confirmButtonText: 'Add'
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            const fieldName = result.value;
+            Swal.fire({
+                title: `Enter the value for ${fieldName}:`,
+                input: 'text',
+                showCancelButton: true,
+                confirmButtonText: 'Add'
+            }).then((result) => {
+                if (result.isConfirmed && result.value !== null) {
+                    const fieldValue = result.value;
+                    const newField = {};
+                    newField[fieldName] = fieldValue;
+                    fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(newField)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        displayGridInfo(data.attributes);
+                        Swal.fire('Success', 'Field added successfully!', 'success');
+                    })
+                    .catch(error => {
+                        console.error('Error adding field:', error);
+                        Swal.fire('Error', 'Failed to add field.', 'error');
+                    });
                 }
-                return response.json();
-            })
-            .then(data => {
-                displayGridInfo(data.attributes);
-                alert('Field added successfully!');
-            })
-            .catch(error => {
-                console.error('Error adding field:', error);
-                alert('Failed to add field.');
             });
         }
-    }
+    });
 }
 
 // Function to save grid information
@@ -249,36 +263,43 @@ function saveGridInfo(gridId) {
         return response.json();
     })
     .then(data => {
-        alert('Grid information updated successfully!');
+        Swal.fire('Success', 'Grid information updated successfully!', 'success');
     })
     .catch(error => {
         console.error('Error saving grid info:', error);
-        alert('Failed to update grid information.');
+        Swal.fire('Error', 'Failed to update grid information.', 'error');
     });
 }
 
 // Function to delete a field from the grid information
 function deleteField(gridId) {
-    const fieldName = prompt("Enter the name of the field to delete:");
-    if (fieldName) {
-        fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}/${fieldName}`, {
-            method: 'DELETE'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            displayGridInfo(data.attributes);
-            alert('Field deleted successfully!');
-        })
-        .catch(error => {
-            console.error('Error deleting field:', error);
-            alert('Failed to delete field.');
-        });
-    }
+    Swal.fire({
+        title: 'Enter the name of the field to delete:',
+        input: 'text',
+        showCancelButton: true,
+        confirmButtonText: 'Delete'
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            const fieldName = result.value;
+            fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}/${fieldName}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                displayGridInfo(data.attributes);
+                Swal.fire('Success', 'Field deleted successfully!', 'success');
+            })
+            .catch(error => {
+                console.error('Error deleting field:', error);
+                Swal.fire('Error', 'Failed to delete field.', 'error');
+            });
+        }
+    });
 }
 
 // Add layer control
