@@ -57,12 +57,7 @@ var canadaProvincesLayer = L.geoJson(null, {
     }
 }).addTo(map);
 
-// Function to set the map view to a specific zoom level
-function setMapView(center, zoom) {
-    map.setView(center, zoom);
-}
-
-// Load GeoJSON data and set the map view to ProvincesOfInterest
+// Load GeoJSON data
 fetch('ProvincesOfInterest.geojson')
     .then(response => {
         if (!response.ok) {
@@ -87,8 +82,6 @@ fetch('grids.geojson')
     })
     .then(data => {
         gridsLayer.addData(data);
-        // Center the map on the grids layer
-        setMapView([56.1304, -106.3468], 6); // Set the desired center and zoom level again
         console.log('grids loaded successfully');
     })
     .catch(error => {
@@ -150,7 +143,7 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
                     displayGridInfo(grid.attributes);
                     gridsLayer.eachLayer(function(layer) {
                         if (layer.feature.properties.Grid === searchText) {
-                            map.fitBounds(layer.getBounds());
+                            map.setView(layer.getBounds().getCenter(), 6); // Center the map on the grid and set zoom level
                         }
                     });
                 })
