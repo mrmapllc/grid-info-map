@@ -111,8 +111,8 @@ var customSearchControl = L.Control.extend({
         div.innerHTML = `
             <input type="text" id="search-input" placeholder="Search..." />
             <select id="search-type">
-                <option value="grid">Grid</option>
                 <option value="address">Address</option>
+                <option value="grid">Grid</option>
             </select>
         `;
         return div;
@@ -178,9 +178,10 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
 
 // Function to display grid information in the sidebar and handle updates
 function displayGridInfo(properties) {
+    const hiddenFields = ['OBJECTID', 'Shape_Length', 'Shape_Area'];
     let content = `<p><strong>Grid:</strong> ${properties.Grid}</p>`;
     for (let key in properties) {
-        if (key !== 'Grid') {
+        if (!hiddenFields.includes(key)) {
             content += `<p><strong>${key}:</strong> <input type="text" id="grid-${key}" value="${properties[key]}" /></p>`;
         }
     }
