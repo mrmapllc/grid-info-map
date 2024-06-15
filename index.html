@@ -18,7 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         #map {
-            height: 100vh;
+            height: calc(100vh - 50px);
         }
         .grid-label {
             color: black;
@@ -65,9 +65,29 @@
         #sidebar {
             display: block;
         }
+        #header {
+            height: 50px;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+        }
+        #header-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        #header-subtitle {
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
+    <div id="header">
+        <div id="header-title">Sweet Grass Contracting LTD Grid Map</div>
+        <div id="header-subtitle">Developed by: Mr. Map, LLC</div>
+    </div>
     <div id="map"></div>
     <button id="toggle-sidebar-button">Grid Information</button>
     <div id="sidebar" class="leaflet-sidebar collapsed">
