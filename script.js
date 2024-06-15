@@ -1,5 +1,5 @@
 // Initialize the map with a higher zoom level
-var map = L.map('map').setView([56.1304, -106.3468], 8); // Adjust the zoom level to be more zoomed in
+var map = L.map('map').setView([56.1304, -106.3468], 6); // Adjust the zoom level to be more zoomed in
 
 // Add a basemap
 var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -67,7 +67,8 @@ fetch('ProvincesOfInterest.geojson')
     })
     .then(data => {
         provincesOfInterestLayer.addData(data);
-        map.fitBounds(provincesOfInterestLayer.getBounds());
+        // Remove the line that adjusts the view based on provincesOfInterestLayer
+        // map.fitBounds(provincesOfInterestLayer.getBounds());
         console.log('ProvincesOfInterest loaded successfully');
     })
     .catch(error => {
