@@ -8,10 +8,10 @@ var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
 
 // Initialize the sidebar
 var sidebar = L.control.sidebar({
-    autopan: true,       // whether to maintain the centered map point when opening the sidebar
-    closeButton: true,   // whether to add a close button to the pane
-    container: 'sidebar', // the DOM container or #ID of a predefined sidebar container that should be used
-    position: 'right'    // left or right
+    autopan: true,
+    closeButton: true,
+    container: 'sidebar',
+    position: 'right'
 }).addTo(map);
 
 // Layer groups
@@ -35,7 +35,7 @@ var gridsLayer = L.geoJson(null, {
             });
         }
     }
-}).addTo(map);  // Add this layer to the map by default
+}).addTo(map);
 
 var provincesOfInterestLayer = L.geoJson(null, {
     style: function (feature) {
@@ -45,7 +45,7 @@ var provincesOfInterestLayer = L.geoJson(null, {
             fillColor: 'transparent'
         };
     }
-}).addTo(map);  // Add this layer to the map by default
+}).addTo(map);
 
 var canadaProvincesLayer = L.geoJson(null, {
     style: function (feature) {
@@ -55,7 +55,7 @@ var canadaProvincesLayer = L.geoJson(null, {
             fillColor: 'transparent'
         };
     }
-}).addTo(map);  // Add this layer to the map by default
+}).addTo(map);
 
 // Load GeoJSON data and set the map view to ProvincesOfInterest
 fetch('ProvincesOfInterest.geojson')
@@ -148,34 +148,96 @@ function displayGridInfo(properties) {
     fetch(`https://grid-info-backend.onrender.com/api/grids/${properties.OBJECTID}`)
         .then(response => response.json())
         .then(grid => {
-            var content = `
-                <p><strong>Grid:</strong> ${grid.attributes.Grid}</p>
-                <p><strong>Info:</strong> <input type="text" id="grid-info" value="${grid.attributes.Info || ''}" /></p>
-                <button onclick="saveGridInfo('${grid.attributes.OBJECTID}')">Save</button>
+            let content = `<p><strong>Grid:</strong> ${grid.attributes.Grid}</p>`;
+            for (let key in grid.attributes) {
+                if (key !== 'Grid') {
+                    content += `<p><strong>${key}:</strong> <input type="text" id="grid-${key}" value="${grid.attributes[key]}" /></p>`;
+                }
+            }
+            content += `
+                <button onclick="addField('${grid.attributes.Grid}')">Add Field</button>
+                <button onclick="saveGridInfo('${grid.attributes.Grid}')">Save</button>
+                <button onclick="deleteField('${grid.attributes.Grid}')">Delete Field</button>
             `;
             document.getElementById('grid-info-content').innerHTML = content;
             sidebar.open('info');
+        })
+        .catch(error => {
+            console.error('Error fetching grid info:', error);
+            alert('Failed to fetch grid information.');
         });
+}
+
+// Function to add a new field to the grid information
+function addField(gridId) {
+    const fieldName = prompt("Enter the name of the new field:");
+    if (fieldName) {
+        const fieldValue = prompt(`Enter the value for ${fieldName}:`);
+        if (fieldValue !== null) {
+            const newField = {};
+            newField[fieldName] = fieldValue;
+            fetch(`https://grid-info-backend.onrender.com/api/grids/${gridId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newField)
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayGridInfo({ OBJECTID: gridId });
+                alert('Field added successfully!');
+            })
+            .catch(error => {
+                console.error('Error adding field:', error);
+                alert('Failed to add field.');
+            });
+        }
+    }
 }
 
 // Function to save grid information
 function saveGridInfo(gridId) {
-    var newInfo = document.getElementById('grid-info').value;
+    const inputs = document.querySelectorAll('#grid-info-content input[type="text"]');
+    const newInfo = {};
+    inputs.forEach(input => {
+        const key = input.id.replace('grid-', '');
+        newInfo[key] = input.value;
+    });
     fetch(`https://grid-info-backend.onrender.com/api/grids/${gridId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ Info: newInfo })
+        body: JSON.stringify(newInfo)
     })
     .then(response => response.json())
     .then(data => {
         alert('Grid information updated successfully!');
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('Error saving grid info:', error);
         alert('Failed to update grid information.');
     });
+}
+
+// Function to delete a field from the grid information
+function deleteField(gridId) {
+    const fieldName = prompt("Enter the name of the field to delete:");
+    if (fieldName) {
+        fetch(`https://grid-info-backend.onrender.com/api/grids/${gridId}/${fieldName}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            displayGridInfo({ OBJECTID: gridId });
+            alert('Field deleted successfully!');
+        })
+        .catch(error => {
+            console.error('Error deleting field:', error);
+            alert('Failed to delete field.');
+        });
+    }
 }
 
 // Add layer control
@@ -189,7 +251,7 @@ var overlays = {
     "Canada Provinces": canadaProvincesLayer
 };
 
-var layerControl = L.control.layers(baseLayers, overlays, { position: 'topleft' }).addTo(map);  // Add the layer control after the search control
+var layerControl = L.control.layers(baseLayers, overlays, { position: 'topleft' }).addTo(map);
 
 // Add custom CSS for labels
 var css = `
