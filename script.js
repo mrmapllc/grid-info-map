@@ -59,21 +59,50 @@ var canadaProvincesLayer = L.geoJson(null, {
 
 // Load GeoJSON data and set the map view to ProvincesOfInterest
 fetch('ProvincesOfInterest.geojson')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         provincesOfInterestLayer.addData(data);
         map.fitBounds(provincesOfInterestLayer.getBounds());
+        console.log('ProvincesOfInterest loaded successfully');
+    })
+    .catch(error => {
+        console.error('Error loading ProvincesOfInterest.geojson:', error);
     });
 
 fetch('grids.geojson')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         gridsLayer.addData(data);
+        console.log('grids loaded successfully');
+    })
+    .catch(error => {
+        console.error('Error loading grids.geojson:', error);
     });
 
 fetch('CanadaProvinces.geojson')
-    .then(response => response.json())
-    .then(data => canadaProvincesLayer.addData(data));
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        canadaProvincesLayer.addData(data);
+        console.log('CanadaProvinces loaded successfully');
+    })
+    .catch(error => {
+        console.error('Error loading CanadaProvinces.geojson:', error);
+    });
 
 // Create custom control container for dropdown and search bar
 var customSearchControl = L.Control.extend({
