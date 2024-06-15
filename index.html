@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-search/dist/leaflet-search.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-sidebar-v2/css/leaflet-sidebar.min.css" />
+    <style>
+        #map {
+            height: 100vh;
+        }
+        .grid-label {
+            color: black;
+            font-weight: bold;
+            background-color: transparent !important;
+            border: none !important;
+            padding: 0;
+        }
+        .custom-search-control {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 5px;
+            border-radius: 4px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+        }
+        .custom-search-control input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px;
+            margin-right: 5px;
+            flex-grow: 1;
+        }
+        .custom-search-control select {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        #grid-info-content {
+            color: gray;
+            font-size: 16px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="sidebar" class="leaflet-sidebar collapsed">
+        <div class="leaflet-sidebar-tabs">
+            <ul role="tablist">
+                <li><a href="#info" role="tab"><i class="fa fa-info"></i></a></li>
+            </ul>
+        </div>
+        <div class="leaflet-sidebar-content">
+            <div class="leaflet-sidebar-pane" id="info">
+                <h1 class="leaflet-sidebar-header">Grid Information<span class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+                <div id="grid-info-content">Search for an Address or a Grid to display information.</div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-search/dist/leaflet-search.min.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="https://unpkg.com/leaflet-sidebar-v2/js/leaflet-sidebar.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
