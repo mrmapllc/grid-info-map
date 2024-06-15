@@ -132,17 +132,21 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
         var searchText = e.target.value;
 
         if (searchType === 'grid') {
-            var found = false;
-            gridsLayer.eachLayer(function(layer) {
-                if (layer.feature.properties.Grid === searchText) {
-                    map.fitBounds(layer.getBounds());
-                    displayGridInfo(layer.feature.properties);
-                    found = true;
-                }
-            });
-            if (!found) {
-                alert('Grid not found');
-            }
+            fetch(`https://grid-info-backend.onrender.com/api/grids/name/${searchText}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(grid => {
+                    // Display grid info and center map on grid
+                    displayGridInfo(grid.attributes);
+                })
+                .catch(error => {
+                    console.error('Error fetching grid info:', error);
+                    alert('Grid not found');
+                });
         } else if (searchType === 'address') {
             geocoder.geocode(searchText, function(results) {
                 if (results && results.length > 0) {
@@ -174,32 +178,19 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
 
 // Function to display grid information in the sidebar and handle updates
 function displayGridInfo(properties) {
-    fetch(`https://grid-info-backend.onrender.com/api/grids/${properties.OBJECTID}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(grid => {
-            let content = `<p><strong>Grid:</strong> ${grid.attributes.Grid}</p>`;
-            for (let key in grid.attributes) {
-                if (key !== 'Grid') {
-                    content += `<p><strong>${key}:</strong> <input type="text" id="grid-${key}" value="${grid.attributes[key]}" /></p>`;
-                }
-            }
-            content += `
-                <button onclick="addField('${properties.OBJECTID}')">Add Field</button>
-                <button onclick="saveGridInfo('${properties.OBJECTID}')">Save</button>
-                <button onclick="deleteField('${properties.OBJECTID}')">Delete Field</button>
-            `;
-            document.getElementById('grid-info-content').innerHTML = content;
-            sidebar.open('info');
-        })
-        .catch(error => {
-            console.error('Error fetching grid info:', error);
-            alert('Failed to fetch grid information.');
-        });
+    let content = `<p><strong>Grid:</strong> ${properties.Grid}</p>`;
+    for (let key in properties) {
+        if (key !== 'Grid') {
+            content += `<p><strong>${key}:</strong> <input type="text" id="grid-${key}" value="${properties[key]}" /></p>`;
+        }
+    }
+    content += `
+        <button onclick="addField('${properties.Grid}')">Add Field</button>
+        <button onclick="saveGridInfo('${properties.Grid}')">Save</button>
+        <button onclick="deleteField('${properties.Grid}')">Delete Field</button>
+    `;
+    document.getElementById('grid-info-content').innerHTML = content;
+    sidebar.open('info');
 }
 
 // Function to add a new field to the grid information
@@ -210,7 +201,7 @@ function addField(gridId) {
         if (fieldValue !== null) {
             const newField = {};
             newField[fieldName] = fieldValue;
-            fetch(`https://grid-info-backend.onrender.com/api/grids/${gridId}`, {
+            fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -224,7 +215,7 @@ function addField(gridId) {
                 return response.json();
             })
             .then(data => {
-                displayGridInfo({ OBJECTID: gridId });
+                displayGridInfo(data.attributes);
                 alert('Field added successfully!');
             })
             .catch(error => {
@@ -243,7 +234,7 @@ function saveGridInfo(gridId) {
         const key = input.id.replace('grid-', '');
         newInfo[key] = input.value;
     });
-    fetch(`https://grid-info-backend.onrender.com/api/grids/${gridId}`, {
+    fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -269,7 +260,7 @@ function saveGridInfo(gridId) {
 function deleteField(gridId) {
     const fieldName = prompt("Enter the name of the field to delete:");
     if (fieldName) {
-        fetch(`https://grid-info-backend.onrender.com/api/grids/${gridId}/${fieldName}`, {
+        fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}/${fieldName}`, {
             method: 'DELETE'
         })
         .then(response => {
@@ -279,7 +270,7 @@ function deleteField(gridId) {
             return response.json();
         })
         .then(data => {
-            displayGridInfo({ OBJECTID: gridId });
+            displayGridInfo(data.attributes);
             alert('Field deleted successfully!');
         })
         .catch(error => {
