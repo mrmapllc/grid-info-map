@@ -73,7 +73,7 @@ fetch('grids.geojson')
 
 fetch('CanadaProvinces.geojson')
     .then(response => response.json())
-    .then(data => canadaProvincesLayer.addData(data));
+    .then(data => canadaProvincesLayer.addData(data);
 
 // Create custom control container for dropdown and search bar
 var customSearchControl = L.Control.extend({
@@ -155,9 +155,9 @@ function displayGridInfo(properties) {
                 }
             }
             content += `
-                <button onclick="addField('${grid.attributes.Grid}')">Add Field</button>
-                <button onclick="saveGridInfo('${grid.attributes.Grid}')">Save</button>
-                <button onclick="deleteField('${grid.attributes.Grid}')">Delete Field</button>
+                <button onclick="addField('${properties.OBJECTID}')">Add Field</button>
+                <button onclick="saveGridInfo('${properties.OBJECTID}')">Save</button>
+                <button onclick="deleteField('${properties.OBJECTID}')">Delete Field</button>
             `;
             document.getElementById('grid-info-content').innerHTML = content;
             sidebar.open('info');
