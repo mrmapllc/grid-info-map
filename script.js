@@ -1,5 +1,5 @@
 // Initialize the map with the desired zoom level and center
-var map = L.map('map').setView([56.1304, -106.3468], 5); // Set initial zoom level to 5
+var map = L.map('map').setView([56.1304, -106.3468], 6); // Set initial zoom level to 6
 
 // Add a basemap
 var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
