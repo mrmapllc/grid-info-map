@@ -1,5 +1,5 @@
 // Initialize the map
-var map = L.map('map').setView([56.1304, -106.3468], 6); // Adjusted zoom level
+var map = L.map('map').setView([56.1304, -106.3468], 7); // More zoomed in by default
 
 // Add a basemap
 var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -142,7 +142,6 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
                 .then(grid => {
                     // Display grid info and center map on grid
                     displayGridInfo(grid.attributes);
-                    openSidebar();
                     gridsLayer.eachLayer(function(layer) {
                         if (layer.feature.properties.Grid === searchText) {
                             map.fitBounds(layer.getBounds());
@@ -174,7 +173,6 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
                             displayGridInfo(layer.feature.properties);
                         }
                     });
-                    openSidebar();
                 } else {
                     Swal.fire('Error', 'Address not found', 'error');
                 }
@@ -313,12 +311,18 @@ function deleteField(gridId) {
 function openSidebar() {
     var sidebarElement = document.getElementById('sidebar');
     sidebarElement.classList.remove('collapsed');
+    // Ensure the active class is added to display the content
+    var sidebarPane = document.getElementById('info');
+    sidebarPane.classList.add('active');
 }
 
 // Function to close the sidebar
 function closeSidebar() {
     var sidebarElement = document.getElementById('sidebar');
     sidebarElement.classList.add('collapsed');
+    // Ensure the active class is removed to hide the content
+    var sidebarPane = document.getElementById('info');
+    sidebarPane.classList.remove('active');
 }
 
 // Add layer control
