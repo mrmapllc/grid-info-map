@@ -142,7 +142,7 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
                 .then(grid => {
                     // Display grid info and center map on grid
                     displayGridInfo(grid.attributes);
-                    sidebar.open('info');
+                    openSidebar();
                     gridsLayer.eachLayer(function(layer) {
                         if (layer.feature.properties.Grid === searchText) {
                             map.fitBounds(layer.getBounds());
@@ -174,7 +174,7 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
                             displayGridInfo(layer.feature.properties);
                         }
                     });
-                    sidebar.open('info');
+                    openSidebar();
                 } else {
                     Swal.fire('Error', 'Address not found', 'error');
                 }
@@ -308,9 +308,26 @@ function deleteField(gridId) {
     });
 }
 
+// Function to open the sidebar
+function openSidebar() {
+    var sidebarElement = document.getElementById('sidebar');
+    sidebarElement.classList.remove('collapsed');
+}
+
+// Function to close the sidebar
+function closeSidebar() {
+    var sidebarElement = document.getElementById('sidebar');
+    sidebarElement.classList.add('collapsed');
+}
+
 // Toggle sidebar visibility
 document.getElementById('toggle-sidebar-button').addEventListener('click', function() {
-    sidebar.toggle();
+    var sidebarElement = document.getElementById('sidebar');
+    if (sidebarElement.classList.contains('collapsed')) {
+        sidebarElement.classList.remove('collapsed');
+    } else {
+        sidebarElement.classList.add('collapsed');
+    }
 });
 
 // Add layer control
