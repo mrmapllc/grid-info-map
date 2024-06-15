@@ -45,24 +45,6 @@
             border-radius: 4px;
             padding: 5px;
         }
-        #toggle-sidebar-button {
-            position: absolute;
-            top: 120px;
-            right: 10px;
-            z-index: 1000;
-            background-color: #fff;
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.65);
-            cursor: pointer;
-        }
-        #sidebar.collapsed {
-            display: none;
-        }
-        #sidebar {
-            display: block;
-        }
         #header {
             height: 50px;
             background-color: #f8f9fa;
@@ -79,17 +61,11 @@
         #header-subtitle {
             font-size: 12px;
         }
-        .leaflet-sidebar-close-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1001;
-            background-color: #fff;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.65);
-            cursor: pointer;
+        #sidebar.collapsed {
+            display: none;
+        }
+        #sidebar {
+            display: block;
         }
     </style>
 </head>
@@ -99,7 +75,6 @@
         <div id="header-subtitle">Developed by: Mr. Map, LLC</div>
     </div>
     <div id="map"></div>
-    <button id="toggle-sidebar-button">Grid Information</button>
     <div id="sidebar" class="leaflet-sidebar collapsed">
         <div class="leaflet-sidebar-tabs">
             <ul role="tablist">
@@ -108,7 +83,6 @@
         </div>
         <div class="leaflet-sidebar-content">
             <div class="leaflet-sidebar-pane" id="info">
-                <button class="leaflet-sidebar-close-button" onclick="closeSidebar()">x</button>
                 <h1 class="leaflet-sidebar-header">Grid Information<span class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
                 <div id="grid-info-content">Search for an Address or a Grid to display information.</div>
             </div>

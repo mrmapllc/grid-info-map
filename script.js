@@ -1,5 +1,5 @@
 // Initialize the map
-var map = L.map('map').setView([56.1304, -106.3468], 5); // Adjusted zoom level
+var map = L.map('map').setView([56.1304, -106.3468], 6); // Adjusted zoom level
 
 // Add a basemap
 var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -198,6 +198,7 @@ function displayGridInfo(properties) {
         <button onclick="deleteField('${properties.Grid}')">Delete Field</button>
     `;
     document.getElementById('grid-info-content').innerHTML = content;
+    openSidebar();  // Ensure sidebar opens when displaying grid info
 }
 
 // Function to add a new field to the grid information
@@ -319,16 +320,6 @@ function closeSidebar() {
     var sidebarElement = document.getElementById('sidebar');
     sidebarElement.classList.add('collapsed');
 }
-
-// Toggle sidebar visibility
-document.getElementById('toggle-sidebar-button').addEventListener('click', function() {
-    var sidebarElement = document.getElementById('sidebar');
-    if (sidebarElement.classList.contains('collapsed')) {
-        sidebarElement.classList.remove('collapsed');
-    } else {
-        sidebarElement.classList.add('collapsed');
-    }
-});
 
 // Add layer control
 var baseLayers = {
