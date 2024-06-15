@@ -1,5 +1,5 @@
 // Initialize the map
-var map = L.map('map').setView([56.1304, -106.3468], 7); // More zoomed in by default
+var map = L.map('map').setView([56.1304, -106.3468], 9); // More zoomed in by default
 
 // Add a basemap
 var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
