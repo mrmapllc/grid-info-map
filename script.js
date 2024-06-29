@@ -216,33 +216,30 @@ function addField(gridId) {
             }).then((result) => {
                 if (result.isConfirmed && result.value !== null) {
                     const fieldValue = result.value;
-                    const newField = {};
-                    newField[fieldName] = fieldValue;
-                    fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(newField)
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        displayGridInfo(data.attributes);
-                        Swal.fire('Success', 'Field added successfully!', 'success');
-                    })
-                    .catch(error => {
-                        console.error('Error adding field:', error);
-                        Swal.fire('Error', 'Failed to add field.', 'error');
-                    });
+                    addFieldToAllGrids(fieldName); // Add field to all grids
+                    Swal.fire('Success', 'Field added successfully to all grids!', 'success');
                 }
             });
         }
     });
+}
+
+// Function to add a new field to all grids
+function addFieldToAllGrids(fieldName) {
+    gridsLayer.eachLayer(function(layer) {
+        const properties = layer.feature.properties;
+        if (!properties[fieldName]) {
+            properties[fieldName] = ''; // Set initial value as empty string or null
+        }
+    });
+
+    // Update the map display after adding fields
+    gridsLayer.eachLayer(function(layer) {
+        layer.setStyle({}); // Update style or perform any necessary update
+    });
+
+    // Save updated grid data to backend (example fetch request)
+    saveGridDataToBackend();
 }
 
 // Function to save grid information
@@ -253,6 +250,8 @@ function saveGridInfo(gridId) {
         const key = input.id.replace('grid-', '');
         newInfo[key] = input.value;
     });
+
+    // Example fetch request to save data to backend
     fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}`, {
         method: 'PUT',
         headers: {
@@ -285,24 +284,50 @@ function deleteField(gridId) {
     }).then((result) => {
         if (result.isConfirmed && result.value) {
             const fieldName = result.value;
-            fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}/${fieldName}`, {
-                method: 'DELETE'
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+
+            // Delete field from all grids
+            gridsLayer.eachLayer(function(layer) {
+                const properties = layer.feature.properties;
+                if (properties.hasOwnProperty(fieldName)) {
+                    delete properties[fieldName];
                 }
-                return response.json();
-            })
-            .then(data => {
-                displayGridInfo(data.attributes);
-                Swal.fire('Success', 'Field deleted successfully!', 'success');
-            })
-            .catch(error => {
-                console.error('Error deleting field:', error);
-                Swal.fire('Error', 'Failed to delete field.', 'error');
             });
+
+            // Update the map display after deleting fields
+            gridsLayer.eachLayer(function(layer) {
+                layer.setStyle({}); // Update style or perform any necessary update
+            });
+
+            // Save updated grid data to backend (example fetch request)
+            saveGridDataToBackend();
+
+            Swal.fire('Success', 'Field deleted successfully from all grids!', 'success');
         }
+    });
+}
+
+// Function to save updated grid data to backend (example)
+function saveGridDataToBackend() {
+    // Example fetch request to save updated GeoJSON data to backend
+    const updatedData = gridsLayer.toGeoJSON();
+    fetch('https://grid-info-backend.onrender.com/api/updateGrids', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Updated grid data saved successfully:', data);
+    })
+    .catch(error => {
+        console.error('Error saving updated grid data:', error);
     });
 }
 
