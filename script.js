@@ -58,7 +58,7 @@ var canadaProvincesLayer = L.geoJson(null, {
 }).addTo(map);
 
 // Load GeoJSON data
-fetch('ProvincesOfInterest.geojson')
+fetch('https://github.com/mrmapllc/grid-info-map/blob/main/ProvincesOfInterest.geojson')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -73,7 +73,7 @@ fetch('ProvincesOfInterest.geojson')
         console.error('Error loading ProvincesOfInterest.geojson:', error);
     });
 
-fetch('grids.geojson')
+fetch('https://github.com/mrmapllc/grid-info-map/blob/main/grids.geojson')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -88,7 +88,7 @@ fetch('grids.geojson')
         console.error('Error loading grids.geojson:', error);
     });
 
-fetch('CanadaProvinces.geojson')
+fetch('https://github.com/mrmapllc/grid-info-map/blob/main/CanadaProvinces.geojson')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -102,6 +102,7 @@ fetch('CanadaProvinces.geojson')
     .catch(error => {
         console.error('Error loading CanadaProvinces.geojson:', error);
     });
+
 
 // Create custom control container for dropdown and search bar
 var customSearchControl = L.Control.extend({
