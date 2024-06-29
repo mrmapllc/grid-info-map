@@ -350,3 +350,62 @@ var css = `
 var style = document.createElement('style');
 style.innerHTML = css;
 document.head.appendChild(style);
+
+async function addFieldToAllGrids() {
+    const { value: fieldName } = await Swal.fire({
+        title: 'Enter the name of the new field:',
+        input: 'text',
+        showCancelButton: true,
+        confirmButtonText: 'Next'
+    });
+
+    if (!fieldName) {
+        return; // User cancelled the prompt or entered nothing
+    }
+
+    const { value: fieldValue } = await Swal.fire({
+        title: `Enter the value for ${fieldName}:`,
+        input: 'text',
+        showCancelButton: true,
+        confirmButtonText: 'Add'
+    });
+
+    if (fieldValue === undefined) {
+        return; // User cancelled the prompt
+    }
+
+    const response = await fetch('https://grid-info-backend.onrender.com/api/grids/add-field-to-all', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            fieldName: fieldName,
+            fieldValue: fieldValue
+        })
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+        Swal.fire('Success', 'Field added to all grid features successfully!', 'success');
+        // Optionally, you can reload the gridsLayer data here to reflect the changes
+        fetch('grids.geojson')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                gridsLayer.clearLayers(); // Clear existing layer data
+                gridsLayer.addData(data); // Add new data to the layer
+                console.log('grids reloaded successfully');
+            })
+            .catch(error => {
+                console.error('Error reloading grids.geojson:', error);
+            });
+    } else {
+        Swal.fire('Error', 'Failed to add field to all grid features.', 'error');
+    }
+}
+
