@@ -452,4 +452,29 @@ async function deleteFieldFromAllGrids() {
     }
 }
 
+// Function to export grid information to an Excel file
+function exportToTable() {
+    fetch('https://grid-info-backend.onrender.com/api/grids/export')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'grids.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            Swal.fire('Success', 'Exported grid information to Excel successfully!', 'success');
+        })
+        .catch(error => {
+            console.error('Error exporting grid information:', error);
+            Swal.fire('Error', 'Failed to export grid information.', 'error');
+        });
+}
 
