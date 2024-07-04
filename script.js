@@ -1,8 +1,8 @@
 // Initialize the map with the desired zoom level and center
-var map = L.map('map').setView([56.1304, -106.3468], 6); // Set initial zoom level to 6
+var map = L.map('map').setView([56.1304, -106.3468], 6);
 
 // Add a basemap
-var basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
@@ -24,7 +24,8 @@ var gridsLayer = L.geoJson(null, {
         };
     },
     onEachFeature: function (feature, layer) {
-        layer.on('click', function() {
+        layer.on('click', function(e) {
+            console.log('Grid clicked:', feature.properties);
             displayGridInfo(feature.properties);
         });
         if (feature.properties && feature.properties.Grid) {
@@ -37,150 +38,15 @@ var gridsLayer = L.geoJson(null, {
     }
 }).addTo(map);
 
-var provincesOfInterestLayer = L.geoJson(null, {
-    style: function (feature) {
-        return {
-            color: '#008000',
-            weight: 5,
-            fillColor: 'transparent'
-        };
-    }
-}).addTo(map);
-
-var canadaProvincesLayer = L.geoJson(null, {
-    style: function (feature) {
-        return {
-            color: '#808080',
-            weight: 1,
-            fillColor: 'transparent'
-        };
-    }
-}).addTo(map);
-
 // Load GeoJSON data
-fetch('ProvincesOfInterest.geojson')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        provincesOfInterestLayer.addData(data);
-        console.log('ProvincesOfInterest loaded successfully');
-    })
-    .catch(error => {
-        console.error('Error loading ProvincesOfInterest.geojson:', error);
-    });
-
 fetch('grids.geojson')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         gridsLayer.addData(data);
-        console.log('grids loaded successfully');
     })
-    .catch(error => {
-        console.error('Error loading grids.geojson:', error);
-    });
+    .catch(error => console.error('Error loading grids.geojson:', error));
 
-fetch('CanadaProvinces.geojson')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        canadaProvincesLayer.addData(data);
-        console.log('CanadaProvinces loaded successfully');
-    })
-    .catch(error => {
-        console.error('Error loading CanadaProvinces.geojson:', error);
-    });
-
-// Create custom control container for dropdown and search bar
-var customSearchControl = L.Control.extend({
-    onAdd: function(map) {
-        var div = L.DomUtil.create('div', 'custom-search-control');
-        div.innerHTML = `
-            <input type="text" id="search-input" placeholder="Search..." />
-            <select id="search-type">
-                <option value="address">Address</option>
-                <option value="grid">Grid</option>
-            </select>
-        `;
-        return div;
-    }
-});
-
-map.addControl(new customSearchControl({ position: 'topright' }));
-
-// Add geocoder control for address search
-var geocoder = L.Control.Geocoder.nominatim();
-var addressMarker;  // Marker for the searched address
-
-// Handle search functionality
-document.getElementById('search-input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        var searchType = document.getElementById('search-type').value;
-        var searchText = e.target.value;
-
-        if (searchType === 'grid') {
-            fetch(`https://grid-info-backend.onrender.com/api/grids/name/${searchText}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(grid => {
-                    // Display grid info and center map on grid
-                    displayGridInfo(grid.attributes);
-                    gridsLayer.eachLayer(function(layer) {
-                        if (layer.feature.properties.Grid === searchText) {
-                            map.setView(layer.getBounds().getCenter(), 6); // Center the map on the grid and set zoom level
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching grid info:', error);
-                    Swal.fire('Error', 'Grid not found', 'error');
-                });
-        } else if (searchType === 'address') {
-            geocoder.geocode(searchText, function(results) {
-                if (results && results.length > 0) {
-                    var result = results[0];
-                    map.setView(result.center, 10);
-                    if (result.bounds) {
-                        map.fitBounds(result.bounds);
-                    }
-                    if (addressMarker) {
-                        map.removeLayer(addressMarker);
-                    }
-                    addressMarker = L.marker(result.center).addTo(map)
-                        .bindPopup(result.name)
-                        .openPopup();
-
-                    // Find and display the grid containing the address
-                    gridsLayer.eachLayer(function(layer) {
-                        if (layer.getBounds().contains(result.center)) {
-                            displayGridInfo(layer.feature.properties);
-                        }
-                    });
-                } else {
-                    Swal.fire('Error', 'Address not found', 'error');
-                }
-            });
-        }
-    }
-});
-
-// Function to display grid information in the sidebar and handle updates
+// Function to display grid information
 function displayGridInfo(properties) {
     const hiddenFields = ['OBJECTID', 'Shape_Length', 'Shape_Area'];
     let content = `<p><strong>Grid:</strong> ${properties.Grid}</p>`;
@@ -195,7 +61,7 @@ function displayGridInfo(properties) {
         <button onclick="deleteField('${properties.Grid}')">Delete Field</button>
     `;
     document.getElementById('grid-info-content').innerHTML = content;
-    openSidebar();  // Ensure sidebar opens when displaying grid info
+    openSidebar();
 }
 
 // Function to add a new field to the grid information
@@ -218,7 +84,7 @@ function addField(gridId) {
                     const fieldValue = result.value;
                     const newField = {};
                     newField[fieldName] = fieldValue;
-                    fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}`, {
+                    fetch(`https://your-app-url.onrender.com/api/grids/name/${gridId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
@@ -253,7 +119,7 @@ function saveGridInfo(gridId) {
         const key = input.id.replace('grid-', '');
         newInfo[key] = input.value;
     });
-    fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}`, {
+    fetch(`https://your-app-url.onrender.com/api/grids/name/${gridId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -285,7 +151,7 @@ function deleteField(gridId) {
     }).then((result) => {
         if (result.isConfirmed && result.value) {
             const fieldName = result.value;
-            fetch(`https://grid-info-backend.onrender.com/api/grids/name/${gridId}/${fieldName}`, {
+            fetch(`https://your-app-url.onrender.com/api/grids/name/${gridId}/${fieldName}`, {
                 method: 'DELETE'
             })
             .then(response => {
@@ -310,7 +176,6 @@ function deleteField(gridId) {
 function openSidebar() {
     var sidebarElement = document.getElementById('sidebar');
     sidebarElement.classList.remove('collapsed');
-    // Ensure the active class is added to display the content
     var sidebarPane = document.getElementById('info');
     sidebarPane.classList.add('active');
 }
@@ -319,7 +184,6 @@ function openSidebar() {
 function closeSidebar() {
     var sidebarElement = document.getElementById('sidebar');
     sidebarElement.classList.add('collapsed');
-    // Ensure the active class is removed to hide the content
     var sidebarPane = document.getElementById('info');
     sidebarPane.classList.remove('active');
 }
@@ -351,6 +215,7 @@ var style = document.createElement('style');
 style.innerHTML = css;
 document.head.appendChild(style);
 
+// Function to add a new field to all grid features
 async function addFieldToAllGrids() {
     const { value: fieldName } = await Swal.fire({
         title: 'Enter the name of the new field:',
@@ -360,7 +225,7 @@ async function addFieldToAllGrids() {
     });
 
     if (!fieldName) {
-        return; // User cancelled the prompt or entered nothing
+        return;
     }
 
     const { value: fieldValue } = await Swal.fire({
@@ -371,10 +236,10 @@ async function addFieldToAllGrids() {
     });
 
     if (fieldValue === undefined) {
-        return; // User cancelled the prompt
+        return;
     }
 
-    const response = await fetch('https://grid-info-backend.onrender.com/api/grids/add-field-to-all', {
+    const response = await fetch('https://your-app-url.onrender.com/api/grids/add-field-to-all', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -388,7 +253,6 @@ async function addFieldToAllGrids() {
     const result = await response.json();
     if (response.ok) {
         Swal.fire('Success', 'Field added to all grid features successfully!', 'success');
-        // Optionally, you can reload the gridsLayer data here to reflect the changes
         fetch('grids.geojson')
             .then(response => {
                 if (!response.ok) {
@@ -397,8 +261,8 @@ async function addFieldToAllGrids() {
                 return response.json();
             })
             .then(data => {
-                gridsLayer.clearLayers(); // Clear existing layer data
-                gridsLayer.addData(data); // Add new data to the layer
+                gridsLayer.clearLayers();
+                gridsLayer.addData(data);
                 console.log('grids reloaded successfully');
             })
             .catch(error => {
@@ -409,6 +273,7 @@ async function addFieldToAllGrids() {
     }
 }
 
+// Function to delete a field from all grid features
 async function deleteFieldFromAllGrids() {
     const { value: fieldName } = await Swal.fire({
         title: 'Enter the name of the field to delete from all grids:',
@@ -418,10 +283,10 @@ async function deleteFieldFromAllGrids() {
     });
 
     if (!fieldName) {
-        return; // User cancelled the prompt or entered nothing
+        return;
     }
 
-    const response = await fetch(`https://grid-info-backend.onrender.com/api/grids/delete-field-from-all/${fieldName}`, {
+    const response = await fetch(`https://your-app-url.onrender.com/api/grids/delete-field-from-all/${fieldName}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -431,7 +296,6 @@ async function deleteFieldFromAllGrids() {
     const result = await response.json();
     if (response.ok) {
         Swal.fire('Success', 'Field deleted from all grid features successfully!', 'success');
-        // Optionally, you can reload the gridsLayer data here to reflect the changes
         fetch('grids.geojson')
             .then(response => {
                 if (!response.ok) {
@@ -440,8 +304,8 @@ async function deleteFieldFromAllGrids() {
                 return response.json();
             })
             .then(data => {
-                gridsLayer.clearLayers(); // Clear existing layer data
-                gridsLayer.addData(data); // Add new data to the layer
+                gridsLayer.clearLayers();
+                gridsLayer.addData(data);
                 console.log('grids reloaded successfully');
             })
             .catch(error => {
@@ -454,7 +318,7 @@ async function deleteFieldFromAllGrids() {
 
 // Function to export grid information to an Excel file
 function exportToTable() {
-    fetch('https://grid-info-backend.onrender.com/api/grids/export')
+    fetch('https://your-app-url.onrender.com/api/grids/export')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -477,4 +341,3 @@ function exportToTable() {
             Swal.fire('Error', 'Failed to export grid information.', 'error');
         });
 }
-
