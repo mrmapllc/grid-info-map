@@ -1,4 +1,4 @@
-// Initialize the map
+// Initialize the map with the desired zoom level and center
 var map = L.map('map').setView([56.1304, -106.3468], 6);
 
 // Add a basemap
