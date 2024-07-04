@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-search@2.9.8/dist/leaflet-search.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-sidebar-v2/css/leaflet-sidebar.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-search@2.9.8/dist/leaflet-search.min.js"></script>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script src="https://unpkg.com/leaflet-sidebar-v2/js/leaflet-sidebar.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -76,6 +72,9 @@
     <div id="header">
         <div id="header-title">Sweet Grass Contracting LTD Grid Map</div>
         <div id="header-subtitle">Developed by: Mr. Map, LLC</div>
+        <button onclick="addFieldToAllGrids()">Add Field to All Grids</button>
+        <button onclick="deleteFieldFromAllGrids()">Delete Field from All Grids</button>
+        <button onclick="exportToTable()">Export to Table</button>
     </div>
     <div id="map"></div>
     <div id="sidebar" class="leaflet-sidebar collapsed">
@@ -88,9 +87,6 @@
             <div class="leaflet-sidebar-pane" id="info">
                 <h1 class="leaflet-sidebar-header">Grid Information<span class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
                 <div id="grid-info-content">Search for an Address or a Grid to display information.</div>
-                <button onclick="addFieldToAllGrids()">Add Field to All Grids</button>
-                <button onclick="deleteFieldFromAllGrids()">Delete Field from All Grids</button>
-                <button onclick="exportToTable()">Export to Table</button>
             </div>
         </div>
     </div>
