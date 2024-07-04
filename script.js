@@ -39,7 +39,7 @@ var gridsLayer = L.geoJson(null, {
 }).addTo(map);
 
 // Load GeoJSON data
-fetch('grids.geojson')
+fetch('https://your-backend-url.com/path-to-backend/grids.geojson')
     .then(response => response.json())
     .then(data => {
         gridsLayer.addData(data);
@@ -84,7 +84,7 @@ function addField(gridId) {
                     const fieldValue = result.value;
                     const newField = {};
                     newField[fieldName] = fieldValue;
-                    fetch(`https://your-app-url.onrender.com/api/grids/name/${gridId}`, {
+                    fetch(`https://your-backend-url.com/api/grids/name/${gridId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
@@ -119,7 +119,7 @@ function saveGridInfo(gridId) {
         const key = input.id.replace('grid-', '');
         newInfo[key] = input.value;
     });
-    fetch(`https://your-app-url.onrender.com/api/grids/name/${gridId}`, {
+    fetch(`https://your-backend-url.com/api/grids/name/${gridId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -151,7 +151,7 @@ function deleteField(gridId) {
     }).then((result) => {
         if (result.isConfirmed && result.value) {
             const fieldName = result.value;
-            fetch(`https://your-app-url.onrender.com/api/grids/name/${gridId}/${fieldName}`, {
+            fetch(`https://your-backend-url.com/api/grids/name/${gridId}/${fieldName}`, {
                 method: 'DELETE'
             })
             .then(response => {
@@ -239,7 +239,7 @@ async function addFieldToAllGrids() {
         return;
     }
 
-    const response = await fetch('https://your-app-url.onrender.com/api/grids/add-field-to-all', {
+    const response = await fetch('https://your-backend-url.com/api/grids/add-field-to-all', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -253,7 +253,7 @@ async function addFieldToAllGrids() {
     const result = await response.json();
     if (response.ok) {
         Swal.fire('Success', 'Field added to all grid features successfully!', 'success');
-        fetch('grids.geojson')
+        fetch('https://your-backend-url.com/path-to-backend/grids.geojson')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -286,7 +286,7 @@ async function deleteFieldFromAllGrids() {
         return;
     }
 
-    const response = await fetch(`https://your-app-url.onrender.com/api/grids/delete-field-from-all/${fieldName}`, {
+    const response = await fetch(`https://your-backend-url.com/api/grids/delete-field-from-all/${fieldName}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -296,7 +296,7 @@ async function deleteFieldFromAllGrids() {
     const result = await response.json();
     if (response.ok) {
         Swal.fire('Success', 'Field deleted from all grid features successfully!', 'success');
-        fetch('grids.geojson')
+        fetch('https://your-backend-url.com/path-to-backend/grids.geojson')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -318,7 +318,7 @@ async function deleteFieldFromAllGrids() {
 
 // Function to export grid information to an Excel file
 function exportToTable() {
-    fetch('https://your-app-url.onrender.com/api/grids/export')
+    fetch('https://your-backend-url.com/api/grids/export')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
