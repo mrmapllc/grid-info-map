@@ -31,7 +31,7 @@ var gridsLayer = L.geoJson(null, {
 }).addTo(map);
 
 // Load GeoJSON data from backend
-fetch('https://your-backend-url.com/path-to-backend/grids.geojson')
+fetch('https://github.com/mrmapllc/grid-info-backend/blob/4f6146b690720f7ea9189521b3e1b61632391803/grids.geojson')
     .then(response => response.json())
     .then(data => {
         gridsLayer.addData(data);
